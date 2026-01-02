@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Jasur Ultimate Site</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: radial-gradient(circle at top, #001f3f, #000);
+  color: white;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.box {
+  background: rgba(0,0,0,0.75);
+  padding: 30px;
+  border-radius: 25px;
+  text-align: center;
+  box-shadow: 0 0 50px cyan;
+  animation: zoom 1s ease;
+  width: 320px;
+}
+
+@keyframes zoom {
+  from {opacity:0; transform: scale(0.6);}
+  to {opacity:1; transform: scale(1);}
+}
+
+.hidden { display: none; }
+
+input, select {
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  margin-top: 10px;
+  width: 90%;
+}
+
+button {
+  margin-top: 10px;
+  padding: 10px;
+  width: 95%;
+  border: none;
+  border-radius: 15px;
+  background: cyan;
+  color: black;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 20px cyan;
+}
+
+.chat {
+  background: #000;
+  padding: 10px;
+  height: 120px;
+  overflow-y: auto;
+  border-radius: 10px;
+  margin-top: 10px;
+  font-size: 14px;
+}
+</style>
+</head>
+
+<body onload="say('Добро пожаловать, Жасур')">
+
+<audio id="clickSound">
+  <source src="https://www.soundjay.com/buttons/sounds/button-16.mp3">
+</audio>
+
+<!-- LOGIN -->
+<div class="box" id="login">
+  <h2>✨ Добро пожаловать, Jasur ✨</h2>
+
+  <select id="voiceType">
+    <option value="male">👨 Мужской голос</option>
+    <option value="female">👩 Женский голос</option>
+  </select>
+
+  <input type="password" id="password" placeholder="Пароль">
+  <button onclick="checkPassword()">Войти</button>
+</div>
+
+<!-- MAIN -->
+<div class="box hidden" id="main">
+  <h3>🚀 Меню</h3>
+
+  <button onclick="openSite('https://www.youtube.com','Открываю YouTube')">▶️ YouTube</button>
+  <button onclick="openSite('https://web.telegram.org','Открываю Telegram')">📬 Telegram</button>
+  <button onclick="openSite('https://chat.openai.com','Открываю ChatGPT')">🤖 ChatGPT</button>
+  <button onclick="openSite('https://www.pinterest.com','Открываю Pinterest')">📌 Pinterest</button>
+
+  <h4>🧠 AI Chat</h4>
+  <div class="chat" id="chatBox"></div>
+  <input id="userText" placeholder="Напиши сообщение">
+  <button onclick="chat()">Отправить</button>
+</div>
+
+<script>
+let selectedVoice = null;
+
+function playClick() {
+  document.getElementById("clickSound").play();
+}
+
+function say(text) {
+  speechSynthesis.cancel();
+  const msg = new SpeechSynthesisUtterance(text);
+  msg.lang = "ru-RU";
+
+  const voices = speechSynthesis.getVoices();
+  const type = document.getElementById("voiceType")?.value;
+
+  if (type === "female") {
+    msg.voice = voices.find(v => v.lang === "ru-RU" && v.name.toLowerCase().includes("female")) || voices[0];
+  } else {
+    msg.voice = voices.find(v => v.lang === "ru-RU") || voices[0];
+  }
+
+  speechSynthesis.speak(msg);
+}
+
+function checkPassword() {
+  playClick();
+  const pass = document.getElementById("password").value;
+  if (pass === "8522") {
+    say("Пароль верный. Добро пожаловать");
+    login.classList.add("hidden");
+    main.classList.remove("hidden");
+  } else {
+    say("Неверный пароль");
+  }
+}
+
+function openSite(url, text) {
+  playClick();
+  say(text);
+  window.open(url, "_blank");
+}
+
+/* SIMPLE AI CHAT */
+function chat() {
+  playClick();
+  const input = document.getElementById("userText");
+  const box = document.getElementById("chatBox");
+  const text = input.value.toLowerCase();
+
+  if (!text) return;
+
+  box.innerHTML += `<div>👤 Ты: ${text}</div>`;
+
+  let reply = "Я тебя понял";
+
+  if (text.includes("привет")) reply = "Привет, Жасур 😎";
+  if (text.includes("как дела")) reply = "У меня всё отлично 🔥";
+  if (text.includes("кто ты")) reply = "Я твой личный AI помощник";
+  if (text.includes("сайт")) reply = "Этот сайт сделал Jasur 💻";
+
+  box.innerHTML += `<div>🤖 AI: ${reply}</div>`;
+  say(reply);
+
+  input.value = "";
+  box.scrollTop = box.scrollHeight;
+}
+</script>
+
+</body>
+</html>
